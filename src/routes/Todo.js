@@ -139,6 +139,7 @@ useEffect(() => {
         ))}
       </select>
       <button onClick={updateCategory}>Save Category</button>
+      <p>Selected Category: {selectedCategory}</p>
     </div>
   );
 }
