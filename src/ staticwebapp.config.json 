@@ -1,55 +1,29 @@
 {
-  "routes": [
-    {
-      "route": "/.auth/login/github",
-      "statusCode": 401
-    },
-    {
-      "route": "/.auth/login/twitter",
-      "statusCode": 401
-    },
-    {
-      "route": "/.auth/login/facebook",
-      "statusCode": 401
-    },
-    {
-      "route": "/.auth/login/google",
-      "statusCode": 401
-    },
-    {
-      "route": "/.auth/logout",
-      "redirect": "/",
-      "statusCode": 302
-    },
-    {
-      "route": "/todos",
-      "allowedRoles": ["authenticated"]
-    },
-    {
-      "route": "/todo/*",
-      "allowedRoles": ["authenticated"]
-    },
-    {
-      "route": "/done",
-      "allowedRoles": ["authenticated"]
-    },
-    {
-      "route": "/todos/:category",
-      "allowedRoles": ["authenticated"]
-    },
-    {
-      "route": "/done/:category",
-      "allowedRoles": ["authenticated"]
-    }
-  ],
-  "navigationFallback": {
-    "rewrite": "/index.html",
-    "exclude": ["/images/*.{png,jpg,gif}", "/css/*", "/api/*"]
-  },
-  "responseOverrides": {
-    "401": {
-      "redirect": "/",
-      "statusCode": 302
+    "routes": [
+        {
+            "route": "/todos",
+            "allowedRoles": ["authenticated"]
+        },
+        {
+            "route": "/todos/*",
+            "allowedRoles": ["authenticated"]
+        },
+        {
+            "route": "/todo/*",
+            "allowedRoles": ["authenticated"]
+        },
+        {
+            "route": "/done",
+            "allowedRoles": ["authenticated"]
+        },
+        {
+            "route": "/done/*",
+            "allowedRoles": ["authenticated"]
+        }
+      ],
+
+    "navigationFallback": {
+      "rewrite": "/index.html",
+      "exclude": ["*.{css,scss,js,png,gif,ico,jpg,svg}"]
     }
   }
-}
