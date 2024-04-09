@@ -1,7 +1,7 @@
 //import React, { useEffect } from 'react';
 import TodoItem from '../common/TodoItem'; // Adjust based on actual location
 import { useState } from 'react';
-import { useLoaderData } from 'react-router-dom';
+import {  useParams,useLoaderData } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
 export async function loader({ request }) {
@@ -21,12 +21,14 @@ function TodoList() {
   const { data } = useLoaderData();
   const [todos, setTodos] = useState(data);
   const [newTodoContent, setNewTodoContent] = useState("");
+  const { category } = useParams(); // 从URL参数中获取类
 
   async function addTodo() {
     const newTodo = {
       title: newTodoContent, // Assuming you only have a title, no description
       description: "", // You can add an input for users to enter a description, or leave it empty
-      completed: false // New todos are not completed by default
+      completed: false, // New todos are not completed by default
+      category: ""
     };
     
     const result = await fetch("/api/todo", {

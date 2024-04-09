@@ -47,13 +47,13 @@ app.http('updateTodo', {
     handler: async (request, context) => {
         const id = request.params.id;
         const body = await request.json();
-        const { title, description, completed } = body;
+        const { title, description, completed,category } = body;
         
         if (ObjectId.isValid(id)) {
             const client = await mongoClient.connect(process.env.AZURE_MONGO_DB)
             const result = await client.db("todo-db").collection("todos").updateOne(
               {_id: new ObjectId(id)}, 
-              {$set: { title, description, completed }}
+              {$set: { title, description, completed,category }}
             );
             client.close();
             if (result.matchedCount > 0) {
@@ -76,8 +76,8 @@ app.http('createTodo', {
     handler: async (request, context) => {
         const client = await mongoClient.connect(process.env.AZURE_MONGO_DB)
         const body = await request.json();
-        const { title, description, completed = false } = body;
-        const newTodo = { title, description, completed };
+        const { title, description, completed = false,category } = body;
+        const newTodo = { title, description, completed,category};
         
         const result = await client.db("todo-db").collection("todos").insertOne(newTodo);
         client.close();
@@ -88,3 +88,4 @@ app.http('createTodo', {
         };
     },
 });
+

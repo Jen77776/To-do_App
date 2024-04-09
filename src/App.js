@@ -4,6 +4,7 @@ import Home from './routes/Home';
 import TodoList, { loader as todoListLoader } from './routes/Todos';
 import Done , { loader as doneLoader }from './routes/Done';
 import Todo from './routes/Todo';
+import Category from './routes/Category';
 import NotFound from './routes/NotFound';
 
 const router = createBrowserRouter([
@@ -24,6 +25,10 @@ const router = createBrowserRouter([
     path: "/done", // Adding the route for individual todo details
     element: <Done />, // This route will render the Todo component
     loader: doneLoader, 
+  },
+  {
+    path: "/todos/:category",
+    element: <Category />,
   },
   // 定义其他路由...
   {
