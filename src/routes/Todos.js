@@ -32,7 +32,7 @@ function TodoList() {
 
   // 在组件加载时获取待办事项和类别列表
   useEffect(() => {
-    checkLoggedIn();
+    //checkLoggedIn();
     async function fetchData() {
       const todosResp = await fetch("/api/todo");
       const todosData = await todosResp.json();
