@@ -5,8 +5,9 @@ function Home() {
   let navigate = useNavigate();
 
   const handleLogin = () => {
-    // 假设登录逻辑已完成，直接跳转到/todos
-    navigate('/todos');
+    // 使用window.location.origin获取当前页面的基础URL，然后拼接认证路径
+    const authUrl = `${window.location.origin}/.auth/login/github`;
+    window.location.href = authUrl;
   };
 
   return (
