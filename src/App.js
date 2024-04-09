@@ -5,6 +5,8 @@ import TodoList, { loader as todoListLoader } from './routes/Todos';
 import Done , { loader as doneLoader }from './routes/Done';
 import Todo from './routes/Todo';
 import Category from './routes/Category';
+import Donecategory from './routes/Donecategory';
+
 import NotFound from './routes/NotFound';
 
 const router = createBrowserRouter([
@@ -29,6 +31,10 @@ const router = createBrowserRouter([
   {
     path: "/todos/:category",
     element: <Category />,
+  },
+  {
+    path: "/done/:category",
+    element: <Donecategory />,
   },
   // 定义其他路由...
   {

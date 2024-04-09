@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import TodoItem from '../common/TodoItem'; // Adjust based on actual location
 import { useParams, Link } from 'react-router-dom';
 
-function Category() {
+function Donecategory() {
   const { category } = useParams();
   const [todos, setTodos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -13,11 +13,11 @@ function Category() {
       setIsLoading(true);
       try {
         const response = await fetch("/api/todo");
-        if (!response.ok) {
+        if (!response.ok) {S
           throw new Error("Network response was not ok");
         }
         const result = await response.json();
-        const filteredTodos = result.data.filter(todo => todo.category === category && !todo.completed);
+        const filteredTodos = result.data.filter(todo => todo.category === category && todo.completed);
         setTodos(filteredTodos);
       } catch (error) {
         console.error("Failed to fetch todos:", error);
@@ -80,4 +80,4 @@ function Category() {
   );
 }
 
-export default Category;
+export default Donecategory;
