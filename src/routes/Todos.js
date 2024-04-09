@@ -19,7 +19,7 @@ function TodoList() {
       // 检查返回的数据中是否有用户信息
       if (!data.clientPrincipal) {
         // 如果没有用户信息，则视为未登录，重定向到根路径'/'
-        console(11111);
+        console.log(11111);
         navigate('/');
       }
       // 如果有用户信息，则视为已登录，无需操作
