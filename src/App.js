@@ -2,7 +2,7 @@ import React from 'react';
 import { RouterProvider, createBrowserRouter , Route, Routes } from 'react-router-dom';
 import Home from './routes/Home';
 import TodoList, { loader as todoListLoader } from './routes/Todos';
-import Done from './routes/Done';
+import Done , { loader as doneLoader }from './routes/Done';
 import Todo from './routes/Todo';
 import NotFound from './routes/NotFound';
 
@@ -15,6 +15,15 @@ const router = createBrowserRouter([
     path: "/todos",
     element: <TodoList />,
     loader: todoListLoader, // 这里使用您的 loader 函数
+  },
+  {
+    path: "/todo/:id", // Adding the route for individual todo details
+    element: <Todo />, // This route will render the Todo component
+  },
+  {
+    path: "/done", // Adding the route for individual todo details
+    element: <Done />, // This route will render the Todo component
+    loader: doneLoader, 
   },
   // 定义其他路由...
   {
