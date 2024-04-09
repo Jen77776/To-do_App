@@ -8,9 +8,28 @@ function Todo() {
   const [editDescription, setEditDescription] = useState(''); // 新增状态来保存编辑中的描述
   const [categories, setCategories] = useState([]); // 添加用于存储类别的状态
   const [selectedCategory, setSelectedCategory] = useState(''); // 当前选中的类别
-
+  //用于检查用户是否登录的函数
+  const checkLoggedIn = async () => {
+    try {
+      // 向/.auth/me发送请求以获取当前用户的登录状态
+      const response = await fetch('/.auth/me');
+      const data = await response.json();
+  
+      // 检查返回的数据中是否有用户信息
+      if (!data.clientPrincipal) {
+        // 如果没有用户信息，则视为未登录，重定向到根路径'/'
+        navigate('/');
+      }
+      // 如果有用户信息，则视为已登录，无需操作
+    } catch (error) {
+      // 如果请求失败，可以根据实际情况处理错误，例如显示错误信息或重定向
+      console.error("Failed to check login status:", error);
+      navigate('/');
+    }
+  };
   useEffect(() => {
     // 从后端获取待办事项的详细信息
+    checkLoggedIn();
     fetch(`/api/todo/${id}`)
       .then(response => response.json())
       .then(data => {
@@ -82,10 +101,16 @@ useEffect(() => {
 };
 
   if (!todo) return <div>Loading...</div>; // 在待办事项数据加载中显示加载状态
+    // 定义handleLogout函数
+    const handleLogout = () => {
+      const logoutUrl = `${window.location.origin}/.auth/logout`;
+      window.location.href = logoutUrl;
+    };
 
   return (
     <div>
       <h1>Todo Details</h1>
+      <button onClick={handleLogout}>Log Out</button>
       {/* 显示待办事项的标题和内容，如果内容过长则使用 CSS 来限制显示为一行 */}
       <h2>{todo.title}</h2>
       <p style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
