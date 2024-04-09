@@ -1,29 +1,30 @@
 {
-    "routes": [
-        {
-            "route": "/todos",
-            "allowedRoles": ["authenticated"]
-        },
-        {
-            "route": "/todos/*",
-            "allowedRoles": ["authenticated"]
-        },
-        {
-            "route": "/todo/*",
-            "allowedRoles": ["authenticated"]
-        },
-        {
-            "route": "/done",
-            "allowedRoles": ["authenticated"]
-        },
-        {
-            "route": "/done/*",
-            "allowedRoles": ["authenticated"]
-        }
-      ],
-
-    "navigationFallback": {
-      "rewrite": "/index.html",
-      "exclude": ["*.{css,scss,js,png,gif,ico,jpg,svg}"]
+  "routes": [
+    {
+      "route": "/todos",
+      "allowedRoles": ["authenticated"]
+    },
+    {
+      "route": "/todo/:id",
+      "allowedRoles": ["authenticated"]
+    },
+    {
+      "route": "/done",
+      "allowedRoles": ["authenticated"]
+    },
+    {
+      "route": "/.auth/login/aad",
+      "statusCode": 401
+    }
+  ],
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/images/*", "/api/*"]
+  },
+  "responseOverrides": {
+    "401": {
+      "redirect": "/",
+      "statusCode": 302
     }
   }
+}
