@@ -9,9 +9,30 @@ function TodoList() {
   const [newCategoryName, setNewCategoryName] = useState("");
   const navigate = useNavigate();
   const { category } = useParams();
+  //用于检查用户是否登录的函数
+  const checkLoggedIn = async () => {
+    try {
+      // 向/.auth/me发送请求以获取当前用户的登录状态
+      const response = await fetch('/.auth/me');
+      const data = await response.json();
+  
+      // 检查返回的数据中是否有用户信息
+      if (!data.clientPrincipal) {
+        // 如果没有用户信息，则视为未登录，重定向到根路径'/'
+        navigate('/');
+      }
+      // 如果有用户信息，则视为已登录，无需操作
+    } catch (error) {
+      // 如果请求失败，可以根据实际情况处理错误，例如显示错误信息或重定向
+      console.error("Failed to check login status:", error);
+      navigate('/');
+    }
+  };
+  
 
   // 在组件加载时获取待办事项和类别列表
   useEffect(() => {
+    checkLoggedIn();
     async function fetchData() {
       const todosResp = await fetch("/api/todo");
       const todosData = await todosResp.json();
@@ -85,10 +106,17 @@ function TodoList() {
       alert("Failed to delete category.");
     }
   }
+  // 定义handleLogout函数
+  const handleLogout = () => {
+    const logoutUrl = `${window.location.origin}/.auth/logout`;
+    window.location.href = logoutUrl;
+  };
   
   return (
     <div>
       <Link to="/">Go Home</Link> | <Link to="/done">Completed Todos</Link>
+      <button onClick={handleLogout}>Log Out</button>
+
       <h1>Todo List {category ? `for ${category}` : ''}</h1>
       {todos.filter(todo => !todo.completed && (!category || todo.category === category)).map((todo) => (
         <TodoItem key={todo._id} todo={todo} />
