@@ -13,7 +13,7 @@ function Donecategory() {
       setIsLoading(true);
       try {
         const response = await fetch("/api/todo");
-        if (!response.ok) {S
+        if (!response.ok) {
           throw new Error("Network response was not ok");
         }
         const result = await response.json();
