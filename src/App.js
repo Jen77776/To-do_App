@@ -1,7 +1,8 @@
 import React from 'react';
 import { RouterProvider, createBrowserRouter , Route, Routes } from 'react-router-dom';
 import Home from './routes/Home';
-import TodoList, { loader as todoListLoader } from './routes/Todos';
+// import TodoList, { loader as todoListLoader } from './routes/Todos';
+import TodoList from './routes/Todos';
 import Done , { loader as doneLoader }from './routes/Done';
 import Todo from './routes/Todo';
 import Category from './routes/Category';
@@ -17,7 +18,6 @@ const router = createBrowserRouter([
   {
     path: "/todos",
     element: <TodoList />,
-    loader: todoListLoader, // 这里使用您的 loader 函数
   },
   {
     path: "/todo/:id", // Adding the route for individual todo details
