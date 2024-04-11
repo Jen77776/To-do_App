@@ -124,14 +124,17 @@ const deleteTodo = async (todoId) => {
 
         <h1 className="title">Completed Todos</h1>
         <div className="box">
-          {todos.filter(todo => todo.completed).map((todo) => (
-            <TodoItem
-              key={todo.id}
-              todo={todo}
-              onComplete={completeTodo}
-              onDelete={deleteTodo}
-            />
-          ))}
+        {todos.filter(todo => todo.completed).map((todo) => (
+    <div className="notification is-primary is-light">
+      {todo.completed && <span className="tag is-success">Completed</span>}
+      <TodoItem
+        key={todo.id}
+        todo={todo}
+        onComplete={completeTodo}
+        onDelete={deleteTodo}
+      />
+    </div>
+  ))}
         </div>
       </div>
     </section>
