@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import 'bulma/css/bulma.min.css'; // 确保已正确引入Bulma
 function Home() {
   let navigate = useNavigate();
 
@@ -28,12 +28,22 @@ function Home() {
     window.location.href = authUrl;
   };
 
+
   return (
-    <div className="home">
-      <h1>Max's To-Do App</h1>
-      <button onClick={handleLogin}>Log In</button>
-    </div>
+    <section className="hero is-primary is-fullheight-with-navbar">
+      <div className="hero-body">
+        <div className="container has-text-centered">
+          <h1 className="title">
+            Max's To-Do App
+          </h1>
+          <button className="button is-light" onClick={handleLogin}>
+            Log In with GitHub
+          </button>
+        </div>
+      </div>
+    </section>
   );
 }
+
 
 export default Home;

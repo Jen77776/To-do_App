@@ -9,6 +9,7 @@ import Category from './routes/Category';
 import Donecategory from './routes/Donecategory';
 
 import NotFound from './routes/NotFound';
+import RequireAuth from './routes/RequireAuth';
 
 const router = createBrowserRouter([
   {
@@ -17,7 +18,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/todos",
-    element: <TodoList />,
+    element: <TodoList/>,
   },
   {
     path: "/todo/:id", // Adding the route for individual todo details
