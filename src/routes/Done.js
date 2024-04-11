@@ -4,6 +4,8 @@ import TodoItem from '../common/TodoItem'; // Adjust based on actual location
 import { useState, useEffect } from 'react';
 import { useLoaderData } from 'react-router-dom';
 import { Link, useNavigate } from 'react-router-dom';
+import 'bulma/css/bulma.min.css';
+
 
 export async function loader({ request }) {
   const result = await fetch("/api/todo", {
@@ -62,21 +64,77 @@ function Done() {
       const logoutUrl = `${window.location.origin}/.auth/logout`;
       window.location.href = logoutUrl;
     };
+      // 获取特定ID的待办事项的完整数据
+const getTodoById = (todoId) => {
+  return todos.find(todo => todo._id === todoId);
+};
+
+const completeTodo = async (todoId) => {
+  const todoToUpdate = getTodoById(todoId);
+
+  // 确保找到了待办事项
+  if (!todoToUpdate) {
+    alert("Todo not found!");
+    return;
+  }
+
+  // 更新待办事项的完成状态
+  const updatedTodo = { ...todoToUpdate, completed: true };
+
+  const response = await fetch(`/api/todo/${todoId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(updatedTodo) // 发送更新后的待办事项
+  });
+
+  if (response.ok) {
+    // 如果成功，更新前端的状态
+    setTodos(todos.map(todo => todo._id === todoId ? updatedTodo : todo));
+    alert("Todo marked as completed!");
+  } else {
+    // 错误处理
+    alert("Failed to complete the todo.");
+  }
+};
+const deleteTodo = async (todoId) => {
+  const response = await fetch(`/api/todo/${todoId}`, {
+    method: 'DELETE'
+  });
+
+  if (response.ok) {
+    // 从状态中移除已删除的待办事项
+    setTodos(todos.filter(todo => todo._id !== todoId));
+  } else {
+    // 错误处理，比如显示错误消息
+    alert("Failed to delete the todo.");
+  }
+};
     
 
   return (
-    <div>
-      <Link to="/">Go Home</Link> | <Link to="/todos">All Todos</Link> {/* 添加一个链接回到所有待办事项的页面 */}
-      <button onClick={handleLogout}>Log Out</button>
-      <h1>Completed Todos</h1>
-      {/* 过滤并映射已完成的待办事项，展示它们 */}
-      {todos.filter(todo => todo.completed).map((todo) => (
-        <div style={{ textDecoration: 'line-through', opacity: 0.6 }}> {/* 添加视觉指示以表明这些待办事项已完成 */}
-          <TodoItem key={todo.id} todo={todo} />
+    <section className="section">
+      <div className="container">
+        <div className="buttons">
+          <Link className="button is-info is-light" to="/">Go Home</Link>
+          <Link className="button is-info is-light" to="/todos">All Todos</Link>
+          <button className="button is-danger is-light" onClick={handleLogout}>Log Out</button>
         </div>
-      ))}
-      {/* 移除创建新待办事项的界面 */}
-    </div>
+
+        <h1 className="title">Completed Todos</h1>
+        <div className="box">
+          {todos.filter(todo => todo.completed).map((todo) => (
+            <TodoItem
+              key={todo.id}
+              todo={todo}
+              onComplete={completeTodo}
+              onDelete={deleteTodo}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 

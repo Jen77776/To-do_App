@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import TodoItem from '../common/TodoItem'; // Adjust based on actual location
 import { useParams, Link } from 'react-router-dom';
-
+import 'bulma/css/bulma.min.css';
 function Donecategory() {
   const { category } = useParams();
   const [todos, setTodos] = useState([]);
@@ -54,29 +54,96 @@ function Donecategory() {
       console.error("Error adding todo:", error);
     }
   }
+  
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
+  const getTodoById = (todoId) => {
+    return todos.find(todo => todo._id === todoId);
+  };
+  
+  const completeTodo = async (todoId) => {
+    const todoToUpdate = getTodoById(todoId);
+  
+    // 确保找到了待办事项
+    if (!todoToUpdate) {
+      alert("Todo not found!");
+      return;
+    }
+  
+    // 更新待办事项的完成状态
+    const updatedTodo = { ...todoToUpdate, completed: true };
+  
+    const response = await fetch(`/api/todo/${todoId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updatedTodo) // 发送更新后的待办事项
+    });
+  
+    if (response.ok) {
+      // 如果成功，更新前端的状态
+      setTodos(todos.map(todo => todo._id === todoId ? updatedTodo : todo));
+      alert("Todo marked as completed!");
+    } else {
+      // 错误处理
+      alert("Failed to complete the todo.");
+    }
+  };
+  const deleteTodo = async (todoId) => {
+    const response = await fetch(`/api/todo/${todoId}`, {
+      method: 'DELETE'
+    });
+  
+    if (response.ok) {
+      // 从状态中移除已删除的待办事项
+      setTodos(todos.filter(todo => todo._id !== todoId));
+    } else {
+      // 错误处理，比如显示错误消息
+      alert("Failed to delete the todo.");
+    }
+  };
 
   return (
-    <div>
-      <Link to="/">Go Home</Link> | <Link to="/todos">All Todos</Link>
-      <h1>Category: {category}</h1>
-      {todos.length > 0 ? (
-        todos.map(todo => <TodoItem key={todo._id} todo={todo} />) // 使用todo._id作为key
-      ) : (
-        <p>No todos found in this category.</p>
-      )}
-      <div>
-        <input
-          value={newTodoContent}
-          onChange={(e) => setNewTodoContent(e.target.value)}
-          placeholder="Enter new todo"
-        />
-        <button onClick={addTodo}>Add Todo</button>
+    <section className="section">
+      <div className="container">
+        <nav className="level">
+          <div className="level-left">
+            <Link className="button is-info is-light" to="/">Go Home</Link>
+            <Link className="button is-info is-light" to="/todos">All Todos</Link>
+          </div>
+        </nav>
+        <h1 className="title">Category: {category}</h1>
+        <div>
+          {todos.length > 0 ? (
+            todos.map(todo => <TodoItem 
+              key={todo._id} 
+              todo={todo} 
+              onComplete={completeTodo}
+              onDelete={deleteTodo}
+              />)
+          ) : (
+            <p className="tag is-warning">No todos found in this category.</p>
+          )}
+        </div>
+        <div className="field has-addons">
+          <div className="control is-expanded">
+            <input
+              className="input is-info"
+              type="text"
+              value={newTodoContent}
+              onChange={(e) => setNewTodoContent(e.target.value)}
+              placeholder="Enter new todo"
+            />
+          </div>
+          <div className="control">
+            <button className="button is-success" onClick={addTodo}>Add Todo</button>
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
 

@@ -115,26 +115,36 @@ app.http('deleteCategory', {
     route: 'category/{categoryName}',
     handler: async (request, context) => {
         const categoryName = request.params.categoryName;
-        const client = await mongoClient.connect(process.env.AZURE_MONGO_DB)
-        const result = await client.db("todo-db").collection("todos").updateMany(
+        const client = await mongoClient.connect(process.env.AZURE_MONGO_DB);
+
+        // 更新待办事项，将属于该类别的待办事项的类别字段设置为null
+        await client.db("todo-db").collection("todos").updateMany(
             { category: categoryName }, 
             { $set: { category: null } }
         );
+
+        // 删除categories集合中的类别
+        const deleteResult = await client.db("todo-db").collection("categories").deleteOne(
+            { name: categoryName }
+        );
+
         client.close();
-        
-        if (result.modifiedCount > 0) {
+
+        // 检查是否有类别被删除，并返回适当的响应
+        if (deleteResult.deletedCount > 0) {
             return {
                 status: 200,
-                jsonBody: { message: "Category deleted and todos updated." }
+                jsonBody: { message: "Category deleted from categories collection and todos updated." }
             };
         } else {
             return {
                 status: 404,
-                jsonBody: { error: "No todos found with that category" }
+                jsonBody: { error: "Category not found in categories collection" }
             };
         }
     },
 });
+
 
 app.http('createCategory', {
     methods: ['POST'],
@@ -169,6 +179,29 @@ app.http('createCategory', {
         return {
             status: 201,
             jsonBody: { _id: result.insertedId, name: categoryName.trim() }
+        };
+    },
+});
+app.http('deleteTodo', {
+    methods: ['DELETE'],
+    authLevel: 'anonymous',
+    route: 'todo/{id}',
+    handler: async (request, context) => {
+        const id = request.params.id;
+        if (ObjectId.isValid(id)) {
+            const client = await mongoClient.connect(process.env.AZURE_MONGO_DB)
+            const result = await client.db("todo-db").collection("todos").deleteOne({_id: new ObjectId(id)});
+            client.close();
+            if (result.deletedCount > 0) {
+                return {
+                    status: 200,
+                    jsonBody: { message: "Todo successfully deleted" }
+                };
+            }
+        }
+        return {
+            status: 404,
+            jsonBody: { error: "No todo found with that ID" }
         };
     },
 });

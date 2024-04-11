@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import TodoItem from '../common/TodoItem'; // 根据实际位置调整
 import { useParams, useNavigate, Link } from 'react-router-dom';
-
+import 'bulma/css/bulma.min.css';
 function TodoList() {
   const [todos, setTodos] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -112,43 +112,125 @@ function TodoList() {
     const logoutUrl = `${window.location.origin}/.auth/logout`;
     window.location.href = logoutUrl;
   };
-  
-  return (
-    <div>
-      <Link to="/">Go Home</Link> | <Link to="/done">Completed Todos</Link>
-      <button onClick={handleLogout}>Log Out</button>
+  // 获取特定ID的待办事项的完整数据
+const getTodoById = (todoId) => {
+  return todos.find(todo => todo._id === todoId);
+};
 
-      <h1>Todo List {category ? `for ${category}` : ''}</h1>
-      {todos.filter(todo => !todo.completed && (!category || todo.category === category)).map((todo) => (
-        <TodoItem key={todo._id} todo={todo} />
-      ))}
-      <div>
-        <input value={newTodoContent} onChange={(e) => setNewTodoContent(e.target.value)} placeholder="Enter new todo" />
-        <button onClick={addTodo}>Add Todo</button>
-      </div>
-      <h2>Categories</h2>
-{categories.map((categoryName, index) => {
-  // 如果类别名称为空，跳过渲染
-  if (!categoryName) {
-    console.log(`Skipping category at index ${index} because it has no name.`);
-    return null;
+const completeTodo = async (todoId) => {
+  const todoToUpdate = getTodoById(todoId);
+
+  // 确保找到了待办事项
+  if (!todoToUpdate) {
+    alert("Todo not found!");
+    return;
   }
 
-  return (
-    <React.Fragment key={index}>
-      <Link to={`/todos/${categoryName}`} style={{ marginRight: 10 }}>
-        {categoryName}
-      </Link>
-      <button onClick={() => deleteCategory(categoryName)}>Delete</button>
-    </React.Fragment>
-  );
-})}
+  // 更新待办事项的完成状态
+  const updatedTodo = { ...todoToUpdate, completed: true };
 
-      <div>
-        <input value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} placeholder="New category name" />
-        <button onClick={addCategory}>Add Category</button>
+  const response = await fetch(`/api/todo/${todoId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(updatedTodo) // 发送更新后的待办事项
+  });
+
+  if (response.ok) {
+    // 如果成功，更新前端的状态
+    setTodos(todos.map(todo => todo._id === todoId ? updatedTodo : todo));
+    alert("Todo marked as completed!");
+  } else {
+    // 错误处理
+    alert("Failed to complete the todo.");
+  }
+};
+
+  const deleteTodo = async (todoId) => {
+    const response = await fetch(`/api/todo/${todoId}`, {
+      method: 'DELETE'
+    });
+  
+    if (response.ok) {
+      // 从状态中移除已删除的待办事项
+      setTodos(todos.filter(todo => todo._id !== todoId));
+    } else {
+      // 错误处理，比如显示错误消息
+      alert("Failed to delete the todo.");
+    }
+  };
+  
+  
+  
+  return (
+    <section className="section">
+    <div className="container">
+      <div className="buttons">
+        <Link className="button is-info is-light" to="/">Go Home</Link>
+        <Link className="button is-info is-light" to="/done">Completed Todos</Link>
+        <button className="button is-danger is-light" onClick={handleLogout}>Log Out</button>
       </div>
+      
+      <h1 className="title">Todo List {category ? `for ${category}` : ''}</h1>
+      <div className="box">
+        {todos.filter(todo => !todo.completed && (!category || todo.category === category)).map((todo) => (
+          <TodoItem
+            key={todo._id}
+            todo={todo}
+            onComplete={completeTodo}
+            onDelete={deleteTodo}
+          />
+        ))}
+      </div>
+      <div className="field has-addons">
+          <div className="control is-expanded">
+            <input
+              className="input is-info"
+              type="text"
+              value={newTodoContent}
+              onChange={(e) => setNewTodoContent(e.target.value)}
+              placeholder="Enter new todo title"
+            />
+          </div>
+          <div className="control">
+            <button className="button is-success" onClick={addTodo}>
+              Add Todo
+            </button>
+          </div>
+        </div>
+      
+      
+      <article className="panel is-info">
+        <p className="panel-heading">
+          Categories
+        </p>
+        <div className="panel-block">
+          <div className="tags are-medium">
+            {categories.map((categoryName, index) => (
+               <span className="tag is-link" key={index} style={{ backgroundColor: '#3273dc', color: 'white' }}> {/* 更深的蓝色背景与白色字体 */}
+               <Link to={`/todos/${categoryName}`} style={{ color: 'white' }}> {/* 确保链接颜色也是白色 */}
+                 {categoryName}
+               </Link>
+               <button className="delete is-small" onClick={() => deleteCategory(categoryName)}></button>
+             </span>
+            ))}
+          </div>
+        </div>
+        <div className="panel-block">
+          <div className="field has-addons">
+            <div className="control is-expanded">
+              <input className="input is-info" type="text" value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} placeholder="New category name" />
+            </div>
+            <div className="control">
+              <button className="button is-success" onClick={addCategory}>Add Category</button>
+            </div>
+          </div>
+        </div>
+      </article>
     </div>
+  </section>
+  
   );
 }
 

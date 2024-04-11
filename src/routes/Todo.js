@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import 'bulma/css/bulma.min.css';
 
 function Todo() {
   const { id } = useParams(); // 从 URL 中获取待办事项 ID
@@ -107,41 +108,48 @@ useEffect(() => {
       window.location.href = logoutUrl;
     };
 
-  return (
-    <div>
-      <h1>Todo Details</h1>
-      <button onClick={handleLogout}>Log Out</button>
-      {/* 显示待办事项的标题和内容，如果内容过长则使用 CSS 来限制显示为一行 */}
-      <h2>{todo.title}</h2>
-      <p style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-        {todo.description}
-      </p>
-      <div>
+    return (
+      <div className="container mt-5">
+        <h1 className="title">Todo Details</h1>
+        <div className="buttons">
+          <button className="button is-info is-light" onClick={() => navigate('/todos')}>Back to Todos</button>
+          <button className="button is-danger is-light" onClick={handleLogout}>Log Out</button>
+        </div>
+        <h2 className="subtitle">Title: {todo.title}</h2>
+    
+        <p className="has-text-grey" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          Description: {todo.description}
+        </p>
+    
         <textarea
+          className="textarea"
           value={editDescription}
           onChange={(e) => setEditDescription(e.target.value)}
-          rows="4"
-          cols="50"
+          rows="2"
         ></textarea>
+        
+        <div className="buttons">
+          <button className="button is-primary is-light" onClick={updateDescription}>Save Description</button>
+          <button className="button is-warning is-light" onClick={markAsDone}>{todo.completed ? 'Already Done' : 'Mark as Done'}</button>
+          
+          <div className="select">
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+            >
+              {categories.map((category, index) => (
+                <option key={index} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+          </div>
+          <button className="button is-link is-light" onClick={updateCategory}>Save Category</button>
+        </div>
+        <p>Current Category: {todo ? todo.category : 'Loading...'}</p> {/* 修改此处以显示当前todo的类别 */}
       </div>
-      <button onClick={updateDescription}>Save Description</button>
-      <button onClick={markAsDone}>{todo.completed ? 'Already Done' : 'Mark as Done'}</button>
-      <button onClick={() => navigate('/todos')}>Back to Todos</button>
-           {/* 类别选择器 */}
-           <select
-        value={selectedCategory}
-        onChange={(e) => setSelectedCategory(e.target.value)}
-      >
-        {categories.map((category, index) => (
-          <option key={index} value={category}>
-            {category}
-          </option>
-        ))}
-      </select>
-      <button onClick={updateCategory}>Save Category</button>
-      <p>Selected Category: {selectedCategory}</p>
-    </div>
-  );
+    );
+  
 }
 
 export default Todo;
