@@ -7,6 +7,7 @@ function TodoList() {
   const [categories, setCategories] = useState([]);
   const [newTodoContent, setNewTodoContent] = useState("");
   const [newCategoryName, setNewCategoryName] = useState("");
+  const [userId, setUserId] = useState(null);  // 新增 userId 状态
   const navigate = useNavigate();
   const { category } = useParams();
   //用于检查用户是否登录的函数
@@ -22,6 +23,7 @@ function TodoList() {
         console.log(11111);
         navigate('/');
       }
+
       // 如果有用户信息，则视为已登录，无需操作
     } catch (error) {
       // 如果请求失败，可以根据实际情况处理错误，例如显示错误信息或重定向
@@ -35,25 +37,49 @@ function TodoList() {
   useEffect(() => {
     checkLoggedIn();
     async function fetchData() {
-      const todosResp = await fetch("/api/todo");
-      const todosData = await todosResp.json();
-      setTodos(todosData.data || []);
-
-      const categoriesResp = await fetch("/api/categories");
-      const categoriesData = await categoriesResp.json();
-      console.log("获取的类别数据:", categoriesData); // 打印原始类别数据
-      setCategories(categoriesData.categories || []);
+      try {
+        const response = await fetch('/.auth/me');
+        const data = await response.json();
+  
+        if (!data.clientPrincipal) {
+          console.log(11111);
+          navigate('/');
+          return; // 如果未登录，直接返回
+        }
+  
+        setUserId(data.clientPrincipal.userId);
+        console.log("this is Userid:", data.clientPrincipal.userId);
+        const todosResp = await fetch("/api/todo");
+        const todosData = await todosResp.json();
+        setTodos(todosData.data || []);
+  
+        const categoriesResp = await fetch("/api/categories");
+        const categoriesData = await categoriesResp.json();
+        console.log("获取的类别数据:", categoriesData); // 打印原始类别数据
+        setCategories(categoriesData.categories || []);
+  
+      } catch (error) {
+        console.error("Failed to check login status:", error);
+        navigate('/');
+      }
     }
+  
     fetchData();
-  }, []);
+  }, [navigate]);
 
   async function addTodo() {
+    if (!userId) {
+      alert("User not logged in.");
+      return;
+    }
     // 创建新待办事项逻辑...
     const newTodo = {
+
       title: newTodoContent, // Assuming you only have a title, no description
       description: "", // You can add an input for users to enter a description, or leave it empty
       completed: false, // New todos are not completed by default
-      category: ""
+      category: "",
+      userId: userId
     };
     
     const result = await fetch("/api/todo", {

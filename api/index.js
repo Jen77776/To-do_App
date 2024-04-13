@@ -8,13 +8,31 @@ app.http('getTodos', {
     route: 'todo',
     handler: async (request, context) => {
         const client = await mongoClient.connect(process.env.AZURE_MONGO_DB)
+        // 获取并解码 x-ms-client-principal 头
+        //const body = await request.json();
+
+       // console.log("body:", body);
+       const principalHeader  = request.headers['x-ms-client-principal'];
+       console.log("request.headers['x-ms-client-principal']", request.headers['x-ms-client-principal']);
+       console.log("header", request.headers);
+       if (principalHeader ){
+        const buffer = Buffer.from(principalHeader, 'base64');
+            const principal = JSON.parse(buffer.toString('utf-8'));
+            const userId = principal.userId;
+            
+            // 打印用户 ID
+            console.log("User ID:", userId);
+       }
+       else{
+        console.log("principalHeader is empty");
+       }
         const todos = await client.db("todo-db").collection("todos").find({}).toArray()
         client.close();
         return {
             jsonBody: {data: todos}
         }
     },
-});
+})
 
 app.http('getTodo', {
     methods: ['GET'],
@@ -76,8 +94,8 @@ app.http('createTodo', {
     handler: async (request, context) => {
         const client = await mongoClient.connect(process.env.AZURE_MONGO_DB)
         const body = await request.json();
-        const { title, description, completed = false,category } = body;
-        const newTodo = { title, description, completed,category};
+        const { title, description, completed = false,category, userId } = body;
+        const newTodo = { title, description, completed,category, userId};
         
         const result = await client.db("todo-db").collection("todos").insertOne(newTodo);
         client.close();
