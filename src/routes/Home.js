@@ -34,7 +34,7 @@ function Home() {
       <div className="hero-body">
         <div className="container has-text-centered">
           <h1 className="title">
-            Max's To-Do App
+            To-Do App
           </h1>
           <button className="button is-light" onClick={handleLogin}>
             Log In with GitHub
