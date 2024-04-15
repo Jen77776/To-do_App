@@ -8,24 +8,26 @@ app.http('getTodos', {
     route: 'todo',
     handler: async (request, context) => {
         const client = await mongoClient.connect(process.env.AZURE_MONGO_DB)
-        // 获取并解码 x-ms-client-principal 头
-        //const body = await request.json();
+        const principalHeader = request.headers['x-ms-client-principal'];
 
-       // console.log("body:", body);
-       const principalHeader  = request.headers['x-ms-client-principal'];
-       console.log("request.headers['x-ms-client-principal']", request.headers['x-ms-client-principal']);
-       console.log("header", request.headers);
-       if (principalHeader ){
-        const buffer = Buffer.from(principalHeader, 'base64');
+        if (principalHeader) {
+            // 解码 Base64 编码的 JSON 字符串
+            const buffer = Buffer.from(principalHeader, 'base64');
             const principal = JSON.parse(buffer.toString('utf-8'));
-            const userId = principal.userId;
+        
+            // 提取 userId
+            const userId = principal && principal.userId;
             
-            // 打印用户 ID
-            console.log("User ID:", userId);
-       }
-       else{
-        console.log("principalHeader is empty");
-       }
+            if (userId) {
+                // 在这里使用 userId 进行你的后续逻辑
+                console.log('User ID:', userId);
+            } else {
+                console.log('No user ID found.');
+            }
+        } else {
+            console.log('No principal header found.');
+        }
+        
         const todos = await client.db("todo-db").collection("todos").find({}).toArray()
         client.close();
         return {

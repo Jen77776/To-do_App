@@ -52,7 +52,9 @@ function TodoList() {
         const todosResp = await fetch("/api/todo");
         const todosData = await todosResp.json();
         setTodos(todosData.data || []);
-  
+        const userTodos = todosData.data.filter(todo => todo.userId === data.clientPrincipal.userId);
+        setTodos(userTodos);
+
         const categoriesResp = await fetch("/api/categories");
         const categoriesData = await categoriesResp.json();
         console.log("获取的类别数据:", categoriesData); // 打印原始类别数据

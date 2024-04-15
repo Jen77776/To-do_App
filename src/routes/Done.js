@@ -24,6 +24,7 @@ function Done() {
   const [todos, setTodos] = useState(data);
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
+  const [userId, setUserId] = useState(null);  // 新增 userId 状态
   //用于检查用户是否登录的函数
   const checkLoggedIn = async () => {
     try {
@@ -48,17 +49,36 @@ function Done() {
    useEffect(() => {
     checkLoggedIn();
     async function fetchData() {
-      const todosResp = await fetch("/api/todo");
-      const todosData = await todosResp.json();
-      setTodos(todosData.data || []);
+      try {
+        const response = await fetch('/.auth/me');
+        const data = await response.json();
+  
+        if (!data.clientPrincipal) {
+          console.log(11111);
+          navigate('/');
+          return; // 如果未登录，直接返回
+        }
+  
+        setUserId(data.clientPrincipal.userId);
+        console.log("this is Userid:", data.clientPrincipal.userId);
+        const todosResp = await fetch("/api/todo");
+        const todosData = await todosResp.json();
+        setTodos(todosData.data || []);
+        const userTodos = todosData.data.filter(todo => todo.userId === data.clientPrincipal.userId);
+        setTodos(userTodos);
 
-      const categoriesResp = await fetch("/api/categories");
-      const categoriesData = await categoriesResp.json();
-      console.log("获取的类别数据:", categoriesData); // 打印原始类别数据
-      setCategories(categoriesData.categories || []);
+        const categoriesResp = await fetch("/api/categories");
+        const categoriesData = await categoriesResp.json();
+        console.log("获取的类别数据:", categoriesData); // 打印原始类别数据
+        setCategories(categoriesData.categories || []);
+  
+      } catch (error) {
+        console.error("Failed to check login status:", error);
+        navigate('/');
+      }
     }
     fetchData();
-  }, []);
+  }, [navigate]);
     // 定义handleLogout函数
     const handleLogout = () => {
       const logoutUrl = `${window.location.origin}/.auth/logout`;
