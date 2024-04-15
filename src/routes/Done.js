@@ -65,7 +65,8 @@ function Done() {
         const todosData = await todosResp.json();
         setTodos(todosData.data || []);
         const userTodos = todosData.data.filter(todo => todo.userId === data.clientPrincipal.userId);
-        setTodos(userTodos);
+        const reversedTodos = userTodos.reverse();
+        setTodos(reversedTodos);
 
         const categoriesResp = await fetch("/api/categories");
         const categoriesData = await categoriesResp.json();
